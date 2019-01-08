@@ -1,0 +1,316 @@
+CREATE TABLE User
+(Username  VARCHAR(20)  NOT NULL,
+ Email          VARCHAR(40)  NOT NULL,
+ Password    VARCHAR(40) NOT NULL,
+ UserType    ENUM('Visitor', 'Staff', 'Admin'), 
+PRIMARY KEY(Username),
+UNIQUE(Email) )
+Engine = Innodb;
+
+CREATE TABLE Admin
+(Username   VARCHAR(20)  NOT NULL,
+PRIMARY KEY (Username),
+FOREIGN KEY (Username)  REFERENCES User (Username)
+      ON DELETE CASCADE        ON UPDATE CASCADE )
+Engine = Innodb;
+
+CREATE TABLE Staff
+(Username  VARCHAR(20)  NOT NULL,
+PRIMARY KEY (Username),
+FOREIGN KEY (Username)  REFERENCES User (Username)
+ON DELETE CASCADE        ON UPDATE CASCADE)
+Engine = Innodb;
+
+CREATE TABLE Visitor
+(Username  VARCHAR(20)  NOT NULL,
+PRIMARY KEY (Username),
+FOREIGN KEY (Username) REFERENCES User (Username)
+ON DELETE CASCADE        ON UPDATE CASCADE)
+Engine = Innodb;
+
+CREATE TABLE Exhibit
+(Name  VARCHAR(20)  NOT NULL,
+Water_Feature  Boolean NOT NULL,
+Size  INT NOT NULL,
+PRIMARY KEY(Name))
+Engine = Innodb;
+
+CREATE TABLE Animal
+(Name VARCHAR(20) NOT NULL,
+Species  VARCHAR(20) NOT NULL,
+Type  VARCHAR(20),
+Age  INT NOT NULL,
+Exhibit  VARCHAR(20) NOT NULL,
+PRIMARY KEY(Name, Species),
+FOREIGN KEY(Exhibit) REFERENCES Exhibit(Name)
+ ON DELETE RESTRICT        ON UPDATE CASCADE )
+Engine = Innodb;
+
+CREATE TABLE Animal_Care
+(Staff_member  VARCHAR(20)  NOT NULL,
+Animal  VARCHAR(20) NOT NULL,
+Species  VARCHAR(20) NOT NULL,
+Datetime  DATETIME,
+Text   VARCHAR(50),
+PRIMARY KEY(Staff_member, Animal, Species, Datetime),
+FOREIGN KEY(Staff_member) REFERENCES Staff(Username)
+      ON DELETE CASCADE        ON UPDATE CASCADE ,
+FOREIGN KEY(Animal,Species) REFERENCES Animal(Name,Species)
+      ON DELETE CASCADE        ON UPDATE CASCADE )
+Engine = Innodb;
+
+CREATE TABLE Shows
+(Name  VARCHAR(20) NOT NULL,
+Datetime DATETIME  NOT NULL,
+Exhibit VARCHAR(20)  NOT NULL,
+Host VARCHAR(20)  NOT NULL,
+PRIMARY KEY(Name, Datetime),
+FOREIGN KEY(Exhibit) REFERENCES Exhibit(Name)
+ON DELETE RESTRICT        ON UPDATE CASCADE, 
+FOREIGN KEY(Host) REFERENCES Staff(Username)
+ON DELETE CASCADE        ON UPDATE CASCADE)
+Engine = Innodb;
+
+CREATE TABLE Visit_Show
+(Visitor  VARCHAR(20) NOT NULL,
+ShowName VARCHAR(20)  NOT NULL,
+Datetime  DATETIME  NOT NULL,
+PRIMARY KEY(Visitor, ShowName, Datetime),
+FOREIGN KEY(Visitor) REFERENCES Visitor(Username)
+      ON DELETE CASCADE        ON UPDATE CASCADE ,
+FOREIGN KEY(ShowName,Datetime) REFERENCES Shows(Name,Datetime)
+      ON DELETE CASCADE        ON UPDATE CASCADE )
+Engine = Innodb;
+
+CREATE TABLE Visit_Exhibit
+(Visitor  VARCHAR(20) NOT NULL,
+Exhibit VARCHAR(20)  NOT NULL,
+Datetime DATETIME,
+PRIMARY KEY(Exhibit, Visitor, Datetime),
+FOREIGN KEY(Visitor) REFERENCES Visitor(Username)
+ON DELETE CASCADE    ON UPDATE CASCADE,
+FOREIGN KEY(Exhibit) REFERENCES Exhibit(Name)
+ON DELETE RESTRICT    ON UPDATE CASCADE )
+Engine = Innodb;
+
+
+
+NEW TEST DATA:
+
+User
+INSERT INTO User(Username, Password, Email, UserType) VALUES('martha_johnson', 'password1', 'marthajohnson@hotmail.com', 'Staff');
+INSERT INTO User(Username, Password, Email, UserType)
+            VALUES('benjamin_rao', 'password2', 'benjaminrao@gmail.com', 'Staff');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('ethan_roswell', 'password3', 'ethanroswell@yahoo.com', 'Staff');
+INSERT INTO User(Username, Password, Email, UserType) 
+
+VALUES('xavier_swenson', 'password4', 'xavierswenson@outlook.com', 'Visitor');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('isabella_rodriguez', 'password5', 'isabellaroderiguez@mail.com', 'Visitor');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('nadias_tevens', 'password6', 'nadiastevens@gmail.com', 'Visitor');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('robert_bernheardt', 'password7', 'robertbernheardt@yahoo.com', 'Visitor');
+
+INSERT INTO User(Username, Password, Email, UserType) VALUES('admin1', 'adminpassword', 'admin@gatech.edu', 'admin');
+
+	//staff//
+
+INSERT INTO Staff(Username) VALUES('martha_johnson');
+INSERT INTO Staff(Username) VALUES('benjamin_rao');
+INSERT INTO Staff(Username) VALUES('ethan_roswell');
+
+//Visitor
+
+INSERT INTO Visitor(Username) VALUES(''xavier_swenson');
+INSERT INTO Visitor(Username) VALUES(''isabella_rodriguez');
+INSERT INTO Visitor(Username) VALUES(nadias_tevens');
+INSERT INTO Visitor(Username) VALUES(''robert_bernheardt');
+	
+/// Admin
+INSERT INTO Admin(Username) VALUES(''admin1'');
+
+Exhibit
+
+INSERT INTO Exhibit(Name, Water_Feature, Size) VALUES('Pacific', true, 850);
+INSERT INTO Exhibit(Name, Water_Feature, Size) VALUES('Jungle', false, 600);
+INSERT INTO Exhibit(Name, Water_Feature, Size) VALUES('Sahara', false, 1000);
+INSERT INTO Exhibit(Name, Water_Feature, Size) VALUES('Mountainous', false, 1200);
+INSERT INTO Exhibit(Name, Water_Feature, Size) VALUES('Birds', true, 1000);
+
+
+Animal
+INSERT INTO Animal(Name,Species,Type,Age,Exhibit) VALUES
+('Goldy', 'Goldfish', 'Fish', 1, 'Pacific'),
+('Nemo', 'Clownfish', 'Fish', 2, 'Pacific'),
+('Pedro', 'Poison Dart frog', 'Amphibian', 3, 'Jungle'),
+('Lincoln', 'Lion', 'Mammal', 8, 'Sahara'),
+('Greg', 'Goat', 'Mammal', 6, 'Mountainous'),
+('Brad', 'Bald Eagle', 'Bird', 4, 'Birds');
+
+
+
+
+
+Show
+
+INSERT INTO Shows(Name,Datetime,Host,Exhibit) VALUES 
+('Jungle Cruise', '2018-10-06 09:00:00', 'martha_johnson', 'Jungle'),
+('Feed the Fish', '2018-10-08 12:00:00', 'martha_johnson', 'Pacific'),
+('Fun Facts', '2018-10-09 15:00:00', 'martha_johnson', 'Sahara'),
+('Climbing', '2018-10-10 16:00:00', 'benjamin_rao', 'Mountainous'),
+('Flight of the Birds', '2018-10-11 15:00:00', 'ethan_roswell', 'Birds'),
+
+
+('Jungle Cruise', '2018-10-12 14:00:00', 'martha_johnson', 'Jungle'),
+('Feed the Fish', '2018-10-02 14:00:00', 'ethan_roswell', 'Pacific'),
+('Fun Facts', '2018-10-13 13:00:00', 'benjamin_rao', 'Sahara'),
+('Climbing', '2018-10-13 17:00:00', 'benjamin_rao', 'Mountainous'),
+('Flight of the Birds', '2018-10-14 14:00:00', 'ethan_roswell', 'Birds'),
+('Bald Eagle Show', '2018-10-15 14:00:00', 'ethan_roswell', 'Birds');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Test Data;
+User
+INSERT INTO User(Username, Password, Email, UserType) VALUES('hao liu', '12345678', 'hliu492@gatech.edu', 'Staff');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('wang wang', '23456789', '377042438@qq.com', 'Staff');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('fang zhou' ,'34567890', 'fangzhoudeyouxiang@g', 'Staff');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('tongwenxin', '122345245', 'wenxintongdeyouxiang@gatech.edu','Staff');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('Wenxin Tong', 'ggggggggggggg', 'twx199461@gmail.com', 'Visitor');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('Wenxin Tong1', 'ggggggggggggg', 'twx1994611@gmail.com', 'Visitor');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('Wenxin Tong2', 'ggggggggggggg', 'twx1994612@gmail.com', 'Visitor');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('Wenxin Tong3', 'ggggggggggggg', 'twx1994613@gmail.com', 'Visitor');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('Wenxin Tong4', 'ggggggggggggg', 'twx1994614@gmail.com', 'Visitor');
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+INSERT INTO User(Username, Password, Email, UserType) VALUES('martha_johnson', 'password1', 'marthajohnson@hotmail.com', 'Staff');
+INSERT INTO User(Username, Password, Email, UserType)
+            VALUES('benjamin_rao', 'password2', 'benjaminrao@gmail.com', 'Staff');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('ethan_roswell', 'password3', 'ethanroswell@yahoo.com', 'Staff');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('xavier_swenson', 'password4', 'xavierswenson@outlook.com', 'Visitor');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('isabella_rodriguez', 'password5', 'isabellaroderiguez@mail.com', 'Visitor');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('nadias_tevens', 'password6', 'nadiastevens@gmail.com', 'Visitor');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('robert_bernheardt', 'password7', 'robertbernheardt@yahoo.com', 'Visitor');
+INSERT INTO User(Username, Password, Email, UserType) VALUES('admin1', 'adminpassword', '', 'admin');
+
+
+
+
+
+
+
+
+Staff
+INSERT INTO Staff(Username) VALUES('hao liu');
+INSERT INTO Staff(Username) VALUES('wang wang');
+INSERT INTO Staff(Username) VALUES('fang zhou');
+INSERT INTO Staff(Username) VALUES('tongwenxin');
+INSERT INTO Staff(Username) VALUES('Wenxin Tong');
+
+Visitor
+INSERT INTO Visitor(Username) VALUES('Wenxin Tong');
+INSERT INTO Visitor(Username) VALUES('Wenxin Tong1');
+INSERT INTO Visitor(Username) VALUES('Wenxin Tong2');
+INSERT INTO Visitor(Username) VALUES('Wenxin Tong3');
+INSERT INTO Visitor(Username) VALUES('Wenxin Tong4');
+
+Animal
+INSERT INTO Animal(Name, Species, Type, Age, Exhibit) VALUES('nemo', 'clownfish', 'fish', 1, 'Pacific');
+INSERT INTO Animal(Name, Species, Type, Age, Exhibit) VALUES('nema', 'angelfish', 'fish', 2, 'Pacific');
+INSERT INTO Animal(Name, Species, Type, Age, Exhibit) VALUES('nemr', 'pufferfish', 'fish', 3, 'Pacific');
+INSERT INTO Animal(Name, Species, Type, Age, Exhibit) VALUES('nemt', 'triggerfish', 'fish', 4, 'Pacific');
+	INSERT INTO Animal(Name, Species, Type, Age, Exhibit) VALUES('nancy', 'bird', 
+'mammal', 3, 'Africa');
+INSERT INTO Animal(Name, Species, Type, Age, Exhibit) VALUES('leo', 'lion', 'mammal', 2, 'Africa');
+INSERT INTO Animal(Name, Species, Type, Age, Exhibit) VALUES('peter', 'elephant', 'mammal', 3, 'Asia');
+INSERT INTO Animal(Name, Species, Type, Age, Exhibit) VALUES('john', 'leopard', 'mammal', 4, 'America');
+INSERT INTO Animal(Name, Species, Type, Age, Exhibit) VALUES('lucy', 'polar bear', 'mammal', 2, 'Antarctica');
+
+
+
+Shows
+INSERT INTO Shows(Name, Datetime, Host, Exhibit) VALUES('Feed the fish', 	'2008-11-11 12:00:00', 'hao liu', 'Pacific' );
+INSERT INTO Shows(Name, Datetime, Host, Exhibit) VALUES('Feed the fish', 	'2008-11-12 12:00:00', 'hao liu', 'Pacific' );
+INSERT INTO Shows(Name, Datetime, Host, Exhibit) VALUES('Feed the fish', 	'2008-11-13 12:00:00', 'hao liu', 'Pacific' );
+INSERT INTO Shows(Name, Datetime, Host, Exhibit) VALUES('Touch the elephant', '2008-11-12 14:00:00', 'Wenxin Tong', 'Africa' );
+INSERT INTO Shows(Name, Datetime, Host, Exhibit)VALUES('Picture with polar bear', '2018-11-13 15:00:00', 'tongwenxin', 'Antarctica');
+INSERT INTO Shows(Name, Datetime, Host, Exhibit)VALUES('GOGOGO', '2018-11-16 12:00:00','wang wang', 'Pacific');
+INSERT INTO Shows(Name, Datetime, Host, Exhibit)VALUES('GAYGAYGAY', '2018-11-20 12:00:00', 'fang zhou', 'America');
+INSERT INTO Shows(Name, Datetime, Host, Exhibit) VALUES('Ride tigers', 	'2019-11-11 12:00:00', 'hao liu', 'Pacific' );
+INSERT INTO Shows(Name, Datetime, Host, Exhibit) VALUES('Ride Lions', 	'2019-11-11 12:00:00', '2', 'Pacific' );
+
+
+
+Exhibit
+INSERT INTO Exhibit(Name, Water_Feature, Size) VALUES('Pacific', true, 400);
+INSERT INTO Exhibit(Name, Water_Feature, Size) VALUES('Africa', false, 500);
+INSERT INTO Exhibit(Name, Water_Feature, Size) VALUES('America', false, 600);
+INSERT INTO Exhibit(Name, Water_Feature, Size) VALUES('Asia', false, 700);
+INSERT INTO Exhibit(Name, Water_Feature, Size) VALUES('Antarctica', true, 800);
+
+Animal_Care
+INSERT INTO Animal_Care(Animal, Species, Staff_member, Datetime, Text) VALUES('nemo', 'clownfish', 'hao liu', '2008-11-11 12:00:00', 'This is nemo' );
+INSERT INTO Animal_Care(Animal, Species, Staff_member, Datetime, Text) VALUES('leo', 'lion', 'wang wang', '2008-12-11 12:00:00', 'This is nemo' );
+INSERT INTO Animal_Care(Animal, Species, Staff_member, Datetime, Text) VALUES('peter', 'elephant', 'fang zhou', '2008-10-11 12:00:00', 'This is nemo' );
+INSERT INTO Animal_Care(Animal, Species, Staff_member, Datetime, Text) VALUES('john', 'leopard', 'tongwenxin', '2008-09-11 12:00:00', 'This is nemo' );
+INSERT INTO Animal_Care(Animal, Species, Staff_member, Datetime, Text) VALUES('lucy', 'polar bear', 'Wenxin Tong', '2008-08-11 12:00:00', 'This is nemo' );
+
+Visit_Show
+INSERT INTO Visit_Show(ShowName, Datetime, Visitor) VALUES('Feed the fish', '2008-11-11 12:00:00', 'Wenxin Tong');
+INSERT INTO Visit_Show(ShowName, Datetime, Visitor) VALUES('Feed the fish', '2008-11-12 12:00:00', 'Wenxin Tong');
+INSERT INTO Visit_Show(ShowName, Datetime, Visitor) VALUES('Feed the fish', '2008-11-13 12:00:00', 'Wenxin Tong');
+INSERT INTO Visit_Show(ShowName, Datetime, Visitor) VALUES('Feed the fish', '2008-11-11 12:00:00', 'Wenxin Tong1');
+INSERT INTO Visit_Show(ShowName, Datetime, Visitor) VALUES('Touch the elephant', '2008-11-12 14:00:00', 'Wenxin Tong2');
+INSERT INTO Visit_Show(ShowName, Datetime, Visitor) VALUES('GOGOGO', '2018-11-16 12:00:00', 'Wenxin Tong2');
+INSERT INTO Visit_Show(ShowName, Datetime, Visitor) VALUES('GAYGAYGAY', '2018-11-20 12:00:00', 'Wenxin Tong2');
+INSERT INTO Visit_Show(ShowName, Datetime, Visitor) VALUES('Feed the fish','2008-11-11 12:00:00', 'Wenxin Tong3');
+
+Visit_Exhibit
+INSERT INTO Visit_Exhibit(Exhibit, Visitor, Datetime) VALUES('Pacific', 'Wenxin Tong', '2008-11-11 12:00:00');
+INSERT INTO Visit_Exhibit(Exhibit, Visitor, Datetime) VALUES('Africa', 'Wenxin Tong1', '2008-11-12 12:00:00');  
+INSERT INTO Visit_Exhibit(Exhibit, Visitor, Datetime) VALUES('Asia', 'Wenxin Tong2', '2008-11-13 12:00:00');
+INSERT INTO Visit_Exhibit(Exhibit, Visitor, Datetime) VALUES('America', 'Wenxin Tong3', '2008-11-14 12:00:00');
+INSERT INTO Visit_Exhibit(Exhibit, Visitor, Datetime) VALUES('Antarctica', 'Wenxin Tong4', '2008-11-15 12:00:00');
